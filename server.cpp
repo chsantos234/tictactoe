@@ -62,7 +62,7 @@ void *player_thread(void *arg) {
     char buffer[BUFFER_SIZE];
 
     while (true) {
-        sem_wait(&player_turn[player]);
+        sem_wait(&player_turn[player]); // espera o turno do jogador
 
         std::string boardState = getBoardString();
         snprintf(buffer, BUFFER_SIZE, "Tabuleiro atual:\n%s\nSua vez (jogador %d, %c):\n", boardState.c_str(), player + 1, mark);
@@ -91,7 +91,7 @@ void *player_thread(void *arg) {
                 close(client_socket);
                 break;
             }
-            sem_post(&player_turn[1 - player]);
+            sem_post(&player_turn[1 - player]); // libera o semáforo
         } else {
             snprintf(buffer, BUFFER_SIZE, "Posição inválida. Tente novamente.\n");
             send(client_socket, buffer, strlen(buffer), 0);
@@ -120,29 +120,18 @@ int main() {
         close(server_fd);
         exit(EXIT_FAILURE);
     }
-    //if (listen(server_fd, 3) < 0) {
-    //    perror("Erro ao ouvir");
-    //    close(server_fd);
-    //    exit(EXIT_FAILURE);
-    //}
+    if (listen(server_fd, 3) < 0) {
+        perror("Erro ao ouvir");
+        close(server_fd);
+        exit(EXIT_FAILURE);
+    }
 
     std::cout << "Aguardando jogadores..." << std::endl;
+
     new_socket[0] = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen);
-    //if (new_socket[0] < 0) {
-    //    perror("Erro ao aceitar jogador 1");
-    //    close(server_fd);
-    //    exit(EXIT_FAILURE);
-    //}
     std::cout << "Jogador 1 conectado." << std::endl;
 
     new_socket[1] = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen);
-    //if (new_socket[1] < 0) {
-    //    perror("Erro ao aceitar jogador 2");
-    //    close(new_socket[0]);
-    //    close(server_fd);
-    //    exit(EXIT_FAILURE);
-    //}
-
     std::cout << "Jogador 2 conectado. Iniciando o jogo!" << std::endl;
 
     initializeBoard();
