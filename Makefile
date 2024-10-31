@@ -1,29 +1,25 @@
-# Compiler
+SERVER = server
+CLIENT = client
+
 CXX = g++
+CXXFLAGS = -pthread -std=c++11
 
-# Compiler flags
-CXXFLAGS = -std=c++20 -pthread
+all: $(SERVER) $(CLIENT)
 
-# Target executable
-TARGET = tictactoe
+$(SERVER): server.cpp
+	$(CXX) $(CXXFLAGS) server.cpp -o $(SERVER)
 
-# Source files
-SRCS = tictactoe.cpp
+$(CLIENT): client.cpp
+	$(CXX) $(CXXFLAGS) client.cpp -o $(CLIENT)
 
-# Object files
-OBJS = $(SRCS:.cpp=.o)
+run_server: $(SERVER)
+	gnome-terminal -- ./$(SERVER)
 
-# Default rule
-all: $(TARGET)
+run_client1: $(CLIENT)
+	gnome-terminal -- ./$(CLIENT)
 
-# Rule to build the target
-$(TARGET): $(OBJS)
-	$(CXX) $(CXXFLAGS) -o $(TARGET) $(OBJS)
+run_client2: $(CLIENT)
+	gnome-terminal -- ./$(CLIENT)
 
-# Rule to build the object files
-%.o: %.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@
-
-# Clean up the build (removes executable and object files)
 clean:
-	rm -f $(OBJS) $(TARGET)
+	rm -f $(SERVER) $(CLIENT)
